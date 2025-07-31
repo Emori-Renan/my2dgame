@@ -1,0 +1,58 @@
+# Visual Studio 2022
+## Ignore Visual Studio temporary files, build outputs, and user-specific settings
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Resharper files
+_ReSharper.*/
+*.resharper
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Visual Studio Code
+.vscode/
+
+# Unity-specific (if you're using Unity)
+# If you are not using Unity, you can remove this section
+Library/
+Temp/
+Build/
+Builds/
+obj/
+
+# Unreal Engine (if applicable)
+# You can remove this section if not using Unreal
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Other common files to ignore
+[Bb]uild/
+[Dd]ist/
+[Ee]xport/
+
+# Log files
+*.log
+
+# Backup files
+*.bak
+
+# User-specific settings for different IDEs
+*.code-workspace
+.DS_Store # macOS specific
+Thumbs.db # Windows specific
