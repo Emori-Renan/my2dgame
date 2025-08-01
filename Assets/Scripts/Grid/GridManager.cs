@@ -7,8 +7,8 @@ public class GridManager : MonoBehaviour
     public static GridManager Instance { get; private set; }
 
     [Header("Grid Settings")]
-    public int width = 20;
-    public int height = 20;
+    public int width = 40;
+    public int height = 40;
 
     [Header("Tile Prefabs")]
     public GameObject grassPrefab;
@@ -48,7 +48,11 @@ public class GridManager : MonoBehaviour
     {
         // Parent the tiles under the GridManager for a cleaner Hierarchy
         Transform parent = transform; 
-
+        
+        // --- NEW CODE: Calculate the offset to center the grid ---
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
+        
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -58,7 +62,9 @@ public class GridManager : MonoBehaviour
                 
                 if (tilePrefab != null)
                 {
-                    Instantiate(tilePrefab, new Vector3(x, y, 0), Quaternion.identity, parent);
+                    // --- CHANGED LINE: Adjust the position to center the grid ---
+                    Vector3 position = new Vector3(x - halfWidth, y - halfHeight, 0);
+                    Instantiate(tilePrefab, position, Quaternion.identity, parent);
                 }
             }
         }
@@ -83,17 +89,24 @@ public class GridManager : MonoBehaviour
     /// <summary>
     /// Helper method to convert a world position to grid coordinates.
     /// This is useful for getting the tile data from a mouse click.
+    /// --- THIS METHOD IS UPDATED TO HANDLE NEGATIVE COORDINATES ---
     /// </summary>
     public Vector2Int GetGridCoordinates(Vector3 worldPosition)
     {
-        int x = Mathf.FloorToInt(worldPosition.x);
-        int y = Mathf.FloorToInt(worldPosition.y);
+        // --- NEW CODE: Calculate the offset to correctly map negative world coordinates ---
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
+        
+        int x = Mathf.FloorToInt(worldPosition.x + halfWidth);
+        int y = Mathf.FloorToInt(worldPosition.y + halfHeight);
+        
         return new Vector2Int(x, y);
     }
     
     /// <summary>
     /// Returns the TileData for a specific grid coordinate.
     /// Other scripts will use this to check for walkability.
+    /// --- THIS METHOD REMAINS THE SAME, as it uses the internal map array's coordinates ---
     /// </summary>
     public TileData GetTileData(Vector2Int gridPosition)
     {

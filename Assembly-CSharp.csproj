@@ -51,8 +51,8 @@
     <Compile Include="Assets\Inputs\PlayerControls.cs" />
     <Compile Include="Assets\Scripts\Grid\TileData.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
-    <Compile Include="Assets\Scripts\Player\NewMonoBehaviourScript.cs" />
     <Compile Include="Assets\Scripts\Grid\MapGenerator.cs" />
+    <Compile Include="Assets\Scripts\Player\GridMovement.cs" />
     <Compile Include="Assets\Scripts\Grid\GridManager.cs" />
   </ItemGroup>
   <ItemGroup>
