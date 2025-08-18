@@ -1,0 +1,33 @@
+{
+  "Rects": null,
+  "Def": {
+    "__cHei": 5,
+    "__cWid": 9,
+    "cachedPixelData": {
+      "opaqueTiles": "000000000000000000000000000000000000000000000",
+      "averageColors": "c9b899b999b89ab899b86a784b78286948696887789768977897698728a838a8288879991a6729778b993b974b976b9729964aa68ba6c898c8a81a6718779b9957982a974a97579689b8889799b8c8972b868aaa39a95ab87ab8"
+    },
+    "customData": [
+
+    ],
+    "embedAtlas": null,
+    "enumTags": [
+
+    ],
+    "identifier": "Basic_Grass_Biom_things",
+    "padding": 0,
+    "pxHei": 80,
+    "pxWid": 144,
+    "relPath": "../../../../../Progar/Sprout Lands - Sprites - Basic pack/Objects/Basic_Grass_Biom_things.png",
+    "savedSelections": [
+
+    ],
+    "spacing": 0,
+    "tags": [
+
+    ],
+    "tagsSourceEnumUid": null,
+    "tileGridSize": 16,
+    "uid": 8
+  }
+}

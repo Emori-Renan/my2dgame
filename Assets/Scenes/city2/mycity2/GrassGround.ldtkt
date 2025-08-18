@@ -1,0 +1,33 @@
+{
+  "Rects": null,
+  "Def": {
+    "__cHei": 7,
+    "__cWid": 22,
+    "cachedPixelData": {
+      "opaqueTiles": "0000000000000000000000010000000000100000000000000000000000000000000000000000000000000000000000000000000000000011111100000111000000001111110000011100000000",
+      "averageColors": "bac6dbc6bac689b6aab6dac6dac6aab6dac6fbc600001dc96ec91dc92dc99dc9cecaceca9dc9becaeeca0000dbc6fbc7dbc6bab6dac6fbc6fbc6dac6fbc6fbc600006ec9feca6ec99dc9ceca9eca9ecacecaeecaeeca0000bac6dbc6bac689b6dac6fbc6fbc6dac6fbc6ebc6ebc61dc96ec91dc92dc9ceca9eca9ecacecaeecaeecaeeca89b6bab689b6a9b6aab6dac6dac6aab6dac6ebc6ebc62dc99dc92dc93dc99dc9cecaceca9dc9becaeecaeecabab6bab679b679b6dac6fbc6fbc6dac6ebc6ebc600001edb0db90edb1db8becaeecaeecabecadeca00000000fbc7fbc7fbc7fbc6fbc6fcd74ab64ab60eea0ed70000fecafecafeca9dc99dc96dc96dc96dc96dc96dc90000fbd7fbc7fbc7fcd7fcd7fbc74cd73cd70ab600000000fecafecafeca9dc99dc96dc96dc900006dc96dc90000"
+    },
+    "customData": [
+
+    ],
+    "embedAtlas": null,
+    "enumTags": [
+
+    ],
+    "identifier": "GrassGround",
+    "padding": 0,
+    "pxHei": 112,
+    "pxWid": 352,
+    "relPath": "../sprite_sheet (1).png",
+    "savedSelections": [
+
+    ],
+    "spacing": 0,
+    "tags": [
+
+    ],
+    "tagsSourceEnumUid": null,
+    "tileGridSize": 16,
+    "uid": 208
+  }
+}

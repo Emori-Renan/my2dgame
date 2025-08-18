@@ -1,0 +1,33 @@
+{
+  "Rects": null,
+  "Def": {
+    "__cHei": 5,
+    "__cWid": 7,
+    "cachedPixelData": {
+      "opaqueTiles": "00000100100000010111101011110001111",
+      "averageColors": "29766a762a769a769a76f97657775976fa765a769a769a76000000005a76fa865a76fa76fa86fa86fa765a76fa765976fa86fa86fa86fa862a766a762976fa86fa76fa86fa76"
+    },
+    "customData": [
+
+    ],
+    "embedAtlas": null,
+    "enumTags": [
+
+    ],
+    "identifier": "Wooden_House_Roof_Tilset",
+    "padding": 0,
+    "pxHei": 80,
+    "pxWid": 112,
+    "relPath": "../../../../../Progar/Sprout Lands - Sprites - Basic pack/Tilesets/Wooden_House_Roof_Tilset.png",
+    "savedSelections": [
+
+    ],
+    "spacing": 0,
+    "tags": [
+
+    ],
+    "tagsSourceEnumUid": null,
+    "tileGridSize": 16,
+    "uid": 6
+  }
+}

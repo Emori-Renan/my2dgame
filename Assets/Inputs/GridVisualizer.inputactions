@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "GridVisualizer",
+    "maps": [
+        {
+            "name": "ToggleGrid",
+            "id": "a7ba3e21-bf5d-4242-a940-717ff1f73aa8",
+            "actions": [
+                {
+                    "name": "ToggleGrid",
+                    "type": "Button",
+                    "id": "3a03c852-07d6-4719-9d4d-b3b39b1a96a4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f14c3765-d526-44bc-863f-b38ecfaa219a",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleGrid",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

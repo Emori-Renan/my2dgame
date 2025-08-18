@@ -1,0 +1,33 @@
+{
+  "Rects": null,
+  "Def": {
+    "__cHei": 6,
+    "__cWid": 9,
+    "cachedPixelData": {
+      "opaqueTiles": "000000000000000000000000000000000000000000000000000000",
+      "averageColors": "69aa49a968896a96399638980000000000004a864a864a864ab649ba4b87000000000000dbb7dab9db98da766a866a867b865a7600004a864a874a76bb865b86ab978b984cb90000dbb7dab9db98000000000000000000000000bbc6bc99b8bb9bc69bc69c999c9998bb98bb"
+    },
+    "customData": [
+
+    ],
+    "embedAtlas": null,
+    "enumTags": [
+
+    ],
+    "identifier": "Basic_Furniture",
+    "padding": 0,
+    "pxHei": 96,
+    "pxWid": 144,
+    "relPath": "../../../../../Progar/Sprout Lands - Sprites - Basic pack/Objects/Basic_Furniture.png",
+    "savedSelections": [
+
+    ],
+    "spacing": 0,
+    "tags": [
+
+    ],
+    "tagsSourceEnumUid": null,
+    "tileGridSize": 16,
+    "uid": 10
+  }
+}

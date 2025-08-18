@@ -1,0 +1,33 @@
+{
+  "Rects": null,
+  "Def": {
+    "__cHei": 3,
+    "__cWid": 5,
+    "cachedPixelData": {
+      "opaqueTiles": "010000101101000",
+      "averageColors": "5a86fa765a86fa76fa765a86fdc95a86fa76fa765a76fa765a76ea760000"
+    },
+    "customData": [
+
+    ],
+    "embedAtlas": null,
+    "enumTags": [
+
+    ],
+    "identifier": "Wooden_House_Walls_Tilset",
+    "padding": 0,
+    "pxHei": 48,
+    "pxWid": 80,
+    "relPath": "../../../../../Progar/Sprout Lands - Sprites - Basic pack/Tilesets/Wooden_House_Walls_Tilset.png",
+    "savedSelections": [
+
+    ],
+    "spacing": 0,
+    "tags": [
+
+    ],
+    "tagsSourceEnumUid": null,
+    "tileGridSize": 16,
+    "uid": 7
+  }
+}

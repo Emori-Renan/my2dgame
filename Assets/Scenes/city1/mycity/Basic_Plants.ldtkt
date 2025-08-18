@@ -1,0 +1,33 @@
+{
+  "Rects": null,
+  "Def": {
+    "__cHei": 2,
+    "__cWid": 6,
+    "cachedPixelData": {
+      "opaqueTiles": "000000000000",
+      "averageColors": "9cb84bb76ab69cc79cb65cb99ca81bb73bb75aa68aa77ba9"
+    },
+    "customData": [
+
+    ],
+    "embedAtlas": null,
+    "enumTags": [
+
+    ],
+    "identifier": "Basic_Plants",
+    "padding": 0,
+    "pxHei": 32,
+    "pxWid": 96,
+    "relPath": "../../../../../Progar/Sprout Lands - Sprites - Basic pack/Objects/Basic_Plants.png",
+    "savedSelections": [
+
+    ],
+    "spacing": 0,
+    "tags": [
+
+    ],
+    "tagsSourceEnumUid": null,
+    "tileGridSize": 16,
+    "uid": 9
+  }
+}

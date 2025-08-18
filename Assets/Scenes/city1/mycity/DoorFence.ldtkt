@@ -1,0 +1,33 @@
+{
+  "Rects": null,
+  "Def": {
+    "__cHei": 4,
+    "__cWid": 8,
+    "cachedPixelData": {
+      "opaqueTiles": "00000000000000000000000000000000",
+      "averageColors": "00003976397600004b966b867b866b8600007966796600004b966b867b866b8600004966397600004b975b967b865b9600007966496600004b975b967b865b96"
+    },
+    "customData": [
+
+    ],
+    "embedAtlas": null,
+    "enumTags": [
+
+    ],
+    "identifier": "DoorFence",
+    "padding": 0,
+    "pxHei": 64,
+    "pxWid": 128,
+    "relPath": "../sprite_sheet (2).png",
+    "savedSelections": [
+
+    ],
+    "spacing": 0,
+    "tags": [
+
+    ],
+    "tagsSourceEnumUid": null,
+    "tileGridSize": 16,
+    "uid": 209
+  }
+}

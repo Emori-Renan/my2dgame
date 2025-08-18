@@ -13,11 +13,11 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Obstacle
+  - Ground
+  - Enemy
+  - Trigger
   - 
   - 
   - 
@@ -43,6 +43,9 @@ TagManager:
     locked: 0
   - name: Layout
     uniqueID: 1494180945
+    locked: 0
+  - name: Objects
+    uniqueID: 2327350045
     locked: 0
   - name: Player
     uniqueID: 1777905999
