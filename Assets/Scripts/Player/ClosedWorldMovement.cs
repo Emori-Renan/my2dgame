@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using MyGame.Managers;
 using MyGame.Core;
 using MyGame.Pathfinding;
-// Removed MyGame.World as Door interaction is removed for simplicity
+using MyGame.World; // Added reference to Door script
 using System;
 
 namespace MyGame.Player
@@ -15,7 +15,9 @@ namespace MyGame.Player
         [Header("Movement Settings")]
         public float moveSpeed = 5f;
         public float speedMultiplier = 1.0f;
-        // Removed LayerMasks for solidObjectsLayer and interactableLayer for simplicity
+
+        [Header("Interaction Settings")]
+        [SerializeField] private LayerMask interactableLayer;
 
         private Animator animator;
         private GridManager gridManager;
@@ -25,21 +27,9 @@ namespace MyGame.Player
         private bool isMoving = false;
         private Vector2 lastDirection = Vector2.down;
         private Queue<Vector2Int> currentPath;
-        // Removed isAiming and isDiagonalOnly for simplicity
 
-        // Removed isTeleporting and key management for simplicity
-        // private bool isTeleporting = false;
-        // [SerializeField] private List<string> collectedKeys = new List<string>();
-
-        private bool _isGridReady = false; // Internal flag for ClosedWorldMovement's readiness
-
-        // Removed public methods for key management and teleporting for simplicity
-        // public void AddKey(string keyName) { /* ... */ }
-        // public bool HasKey(string keyName) { /* ... */ }
-        // public void RemoveKey(string keyName) { /* ... */ }
-        // public bool IsTeleporting() { return isTeleporting; }
-        // public void SetIsTeleporting(bool state) { /* ... */ }
-
+        private bool _isGridReady = false;
+        private bool _isDiagonalOnlyActive = false;
 
         private void Awake()
         {
@@ -74,7 +64,10 @@ namespace MyGame.Player
                 InputManager.Instance.onMovePerformed -= OnMoveInputPerformed;
                 InputManager.Instance.onMoveCanceled -= OnMoveInputCanceled;
                 InputManager.Instance.onSelectPerformed -= OnSelectPerformed;
-                // Removed unsubscriptions for Interact, ToggleGrid, DiagonalMove
+                InputManager.Instance.onToggleGridPerformed -= OnToggleGridPerformed;
+                InputManager.Instance.onDiagonalMovePerformed -= HandleDiagonalMovePerformed;
+                InputManager.Instance.onDiagonalMoveCanceled -= HandleDiagonalMoveCanceled;
+                InputManager.Instance.onInteractPerformed -= OnInteractPerformed;
             }
         }
 
@@ -94,7 +87,10 @@ namespace MyGame.Player
                 InputManager.Instance.onMovePerformed += OnMoveInputPerformed;
                 InputManager.Instance.onMoveCanceled += OnMoveInputCanceled;
                 InputManager.Instance.onSelectPerformed += OnSelectPerformed;
-                // Removed subscriptions for Interact, ToggleGrid, DiagonalMove
+                InputManager.Instance.onToggleGridPerformed += OnToggleGridPerformed;
+                InputManager.Instance.onDiagonalMovePerformed += HandleDiagonalMovePerformed;
+                InputManager.Instance.onDiagonalMoveCanceled += HandleDiagonalMoveCanceled;
+                InputManager.Instance.onInteractPerformed += OnInteractPerformed;
             }
             Debug.Log("ClosedWorldMovement: Enabled.");
         }
@@ -106,7 +102,10 @@ namespace MyGame.Player
                 InputManager.Instance.onMovePerformed -= OnMoveInputPerformed;
                 InputManager.Instance.onMoveCanceled -= OnMoveInputCanceled;
                 InputManager.Instance.onSelectPerformed -= OnSelectPerformed;
-                // Removed unsubscriptions for Interact, ToggleGrid, DiagonalMove
+                InputManager.Instance.onToggleGridPerformed -= OnToggleGridPerformed;
+                InputManager.Instance.onDiagonalMovePerformed -= HandleDiagonalMovePerformed;
+                InputManager.Instance.onDiagonalMoveCanceled -= HandleDiagonalMoveCanceled;
+                InputManager.Instance.onInteractPerformed -= OnInteractPerformed;
             }
             StopAllMovement();
             Debug.Log("ClosedWorldMovement: Disabled.");
@@ -114,14 +113,11 @@ namespace MyGame.Player
 
         private void Start()
         {
-            // Removed AddKey for simplicity
+            // Initial setup can go here
         }
 
         private void Update()
         {
-            // Simplified: No isTeleporting check
-            // if (isTeleporting) { StopAllMovement(); return; }
-
             if (gameManager == null || !gameManager.IsGameReadyForInput || gameManager.currentGameState != GameState.Playing ||
                 gridManager == null || !gridManager.IsGridDataInitialized || sceneGrid == null || !_isGridReady)
             {
@@ -135,13 +131,18 @@ namespace MyGame.Player
                 }
                 return;
             }
-            // Simplified: No isAiming check
-            // if (isAiming) { StopAllMovement(); RotatePlayerToMouse(); return; }
 
             Vector2 movementInput = InputManager.Instance.GetMovementDirection();
 
-            // Simplified: No isDiagonalOnly check
-            // if (isDiagonalOnly) { /* ... */ }
+            if (_isDiagonalOnlyActive)
+            {
+                if (Mathf.Abs(movementInput.x) < 0.1f || Mathf.Abs(movementInput.y) < 0.1f)
+                {
+                    if (isMoving) StopAllMovement();
+                    UpdateAnimation(Vector2.zero);
+                    return;
+                }
+            }
 
             if (!isMoving && movementInput != Vector2.zero)
             {
@@ -176,73 +177,63 @@ namespace MyGame.Player
             }
         }
 
-        // Renamed to match InputManager events directly
-        private void OnMoveInputPerformed(Vector2 movement)
+        // --- Event Handlers from InputManager ---
+        private void OnMoveInputPerformed(Vector2 movement) { }
+        private void OnMoveInputCanceled() { }
+        private void OnSelectPerformed() { }
+        private void OnToggleGridPerformed() { }
+
+        private void HandleDiagonalMovePerformed()
         {
-            // InputManager's GetMovementDirection handles continuous input; this is mainly for event trigger
+            _isDiagonalOnlyActive = true;
+            Debug.Log("Diagonal move active");
         }
 
-        private void OnMoveInputCanceled()
+        private void HandleDiagonalMoveCanceled()
         {
-            // InputManager's GetMovementDirection handles continuous input; this is mainly for event trigger
+            _isDiagonalOnlyActive = false;
+            Debug.Log("Diagonal move inactive");
         }
-
-        private void OnSelectPerformed() // No parameters
+        
+        private void OnInteractPerformed()
         {
-            // Simplified: No isAiming or isTeleporting check
-            // if (isAiming || isTeleporting) return;
+            Debug.Log("OnInteractPerformed: Interaction button pressed.");
             if (gameManager == null || !gameManager.IsGameReadyForInput || gameManager.currentGameState != GameState.Playing)
             {
-                return;
-            }
-            if (gridManager == null || sceneGrid == null || !gridManager.IsGridDataInitialized || !_isGridReady)
-            {
-                Debug.LogWarning("ClosedWorldMovement: GridManager or sceneGrid not ready or grid data not initialized for OnSelectPerformed. Cannot initiate movement.");
+                Debug.Log("OnInteractPerformed: Game is not ready for input. Interaction cancelled.");
                 return;
             }
 
-            if (!isMoving)
+            // Determine the tile in front of the player based on their last facing direction
+            Vector2Int currentGridPos = gridManager.GetGridCoordinates(transform.position);
+            Vector2Int targetGridPos = currentGridPos + new Vector2Int(Mathf.RoundToInt(lastDirection.x), Mathf.RoundToInt(lastDirection.y));
+            Vector3 targetWorldPosition = gridManager.GetWorldPosition(targetGridPos);
+
+            Debug.Log($"OnInteractPerformed: Checking for interaction at grid position {targetGridPos} (world pos: {targetWorldPosition}). Player last direction: {lastDirection}");
+
+            // Check for an interactable object at the target position, specifically a Door
+            Collider2D[] colliders = Physics2D.OverlapPointAll(targetWorldPosition, interactableLayer);
+            Debug.Log($"OnInteractPerformed: Found {colliders.Length} colliders at the target position.");
+
+            foreach (Collider2D collider in colliders)
             {
-                Vector2 mousePosition = Mouse.current.position.ReadValue();
-                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, Camera.main.nearClipPlane));
-                Vector3Int targetCell = sceneGrid.WorldToCell(worldPosition);
-                Vector2Int startGridPos = gridManager.GetGridCoordinates(transform.position);
-                Vector2Int targetGridPos = gridManager.GetGridCoordinates(sceneGrid.CellToWorld(targetCell));
-
-                Debug.Log($"--- Player Select Debug ---");
-                Debug.Log($"Mouse World Pos: {worldPosition}");
-                Debug.Log($"Target Cell Pos (Unity Grid): {targetCell}");
-                Debug.Log($"Calculated Start Grid Pos (0-indexed): {startGridPos}");
-                Debug.Log($"Calculated Target Grid Pos (0-indexed): {targetGridPos}");
-
-                if (!gridManager.IsPositionValid(startGridPos) || !gridManager.IsPositionValid(targetGridPos))
+                Debug.Log($"OnInteractPerformed: Checking collider with name '{collider.name}'.");
+                Door door = collider.GetComponent<Door>();
+                if (door != null)
                 {
-                    Debug.LogWarning($"ClosedWorldMovement: Invalid start ({startGridPos}) or target ({targetGridPos}) grid position for OnSelect. Cannot move.");
-                    return;
+                    Debug.Log($"OnInteractPerformed: Found Door component. Toggling door on object '{door.gameObject.name}'.");
+                    door.ToggleDoor();
+                    return; // Interact with only one door at a time
                 }
-
-                StartMoveToPath(startGridPos, targetGridPos);
             }
+            Debug.Log("OnInteractPerformed: No door found at the target position.");
         }
-
-        // Removed OnInteractPerformed for simplicity
-        // private void OnInteractPerformed() { /* ... */ }
-
-        // Removed OnToggleGridPerformed for simplicity
-        // private void OnToggleGridPerformed() { /* ... */ }
-
-        // Removed OnDiagonalMovePerformed and OnDiagonalMoveCanceled for simplicity
-        // private void OnDiagonalMovePerformed() { /* ... */ }
-        // private void OnDiagonalMoveCanceled() { /* ... */ }
+        // --- End of Event Handlers ---
 
         public void SetSpeedMultiplier(float newMultiplier)
         {
             speedMultiplier = newMultiplier;
         }
-
-        // Removed RotatePlayerToMouse for simplicity
-        // private void RotatePlayerToMouse() { /* ... */ }
-
 
         private void StartMoveToPath(Vector2Int startPos, Vector2Int targetPos)
         {

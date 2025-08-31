@@ -1,14 +1,35 @@
 using UnityEngine;
 
-namespace MyGame.World 
+namespace MyGame.World
 {
+    // A simple script to represent a door that can be interacted with.
+    [RequireComponent(typeof(SpriteRenderer))]
     public class Door : MonoBehaviour
     {
-        // Public method called by the player script when they press 'E'
-        public void Interact()
+        private SpriteRenderer spriteRenderer;
+        private bool isOpen = false;
+
+        private void Awake()
         {
-            // Log a message to confirm the interaction is working
-            Debug.Log($"Door '{gameObject.name}': Interact (E) pressed.");
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        /// <summary>
+        /// Toggles the state of the door between open and closed.
+        /// </summary>
+        public void ToggleDoor()
+        {
+            isOpen = !isOpen;
+            if (isOpen)
+            {
+                Debug.Log("Door: Opening door.");
+                spriteRenderer.color = Color.green; // Visual cue for "open"
+            }
+            else
+            {
+                Debug.Log("Door: Closing door.");
+                spriteRenderer.color = Color.white; // Visual cue for "closed"
+            }
         }
     }
 }
