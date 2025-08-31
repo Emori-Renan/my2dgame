@@ -42,7 +42,7 @@
     <UnityVersion>6000.1.13f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Users\USER\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.1.2\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\USER\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.1.3\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="D:\unity\6000.1.13f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="D:\unity\6000.1.13f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="D:\unity\6000.1.13f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -50,18 +50,27 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Core\ITurnTaker.cs" />
     <Compile Include="Assets\Inputs\PlayerControls.cs" />
+    <Compile Include="Assets\Scripts\Components\DoorColliderManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Prefab\TilePrefabMapping.cs" />
+    <Compile Include="Assets\Scripts\World\SpawnPoint.cs" />
+    <Compile Include="Assets\Scripts\Components\DoorTeleporter.cs" />
     <Compile Include="Assets\Prefabs\Player\PlayerInputActions.cs" />
     <Compile Include="Assets\Scripts\Shared\Enums.cs" />
     <Compile Include="Assets\Scripts\Shared\SceneLoader.cs" />
     <Compile Include="Assets\Scripts\Managers\GridRenderer.cs" />
+    <Compile Include="Assets\Scripts\World\Door.cs" />
+    <Compile Include="Assets\Scripts\World\SceneGridInitializer.cs" />
     <Compile Include="Assets\Scripts\Shared\TileData.cs" />
+    <Compile Include="Assets\Scripts\World\LayerTransparencyController.cs" />
     <Compile Include="Assets\Scripts\Pathfinding\AStarPathfinding.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Core\TileAutoMapper.cs" />
     <Compile Include="Assets\Scripts\Managers\TurnManager.cs" />
     <Compile Include="Assets\Scripts\Player\ClosedWorldMovement.cs" />
+    <Compile Include="Assets\Scripts\Components\DoorGridUpdater.cs" />
+    <Compile Include="Assets\Scripts\Managers\InitialSceneLoader.cs" />
+    <Compile Include="Assets\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\Scripts\Shared\TileMappingData.cs" />
     <Compile Include="Assets\Scripts\Managers\GridManager.cs" />
     <Compile Include="Assets\Scripts\Core\Enums.cs" />

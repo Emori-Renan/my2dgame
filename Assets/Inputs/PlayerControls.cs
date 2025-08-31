@@ -98,7 +98,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""id"": ""ecbc0e95-8d2d-4480-8df0-7d1844eaf5aa"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Press"",
                     ""initialStateCheck"": true
                 },
                 {
@@ -116,7 +116,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""id"": ""b9c12f25-72e8-4ef8-9848-1938f5601a50"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Press"",
                     ""initialStateCheck"": false
                 },
                 {
@@ -125,7 +125,16 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""id"": ""264051f8-50d0-46a5-9d8c-bcedffc72a8d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": ""Hold"",
+                    ""interactions"": ""Hold(duration=0.1,pressPoint=1.401298E-45)"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""46e90a23-aa96-414b-9d21-fdb877d2cb40"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
                     ""initialStateCheck"": false
                 }
             ],
@@ -202,7 +211,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard and mouse"",
                     ""action"": ""ToggleGrid"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -215,6 +224,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard and mouse"",
                     ""action"": ""DiagonalMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7ffd6f3b-8c2d-4bba-8eef-8ff55625a310"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard and mouse"",
+                    ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -246,6 +266,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Select = m_Player.FindAction("Select", throwIfNotFound: true);
         m_Player_ToggleGrid = m_Player.FindAction("ToggleGrid", throwIfNotFound: true);
         m_Player_DiagonalMove = m_Player.FindAction("DiagonalMove", throwIfNotFound: true);
+        m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -330,6 +351,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Select;
     private readonly InputAction m_Player_ToggleGrid;
     private readonly InputAction m_Player_DiagonalMove;
+    private readonly InputAction m_Player_Interact;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -357,6 +379,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/DiagonalMove".
         /// </summary>
         public InputAction @DiagonalMove => m_Wrapper.m_Player_DiagonalMove;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Interact".
+        /// </summary>
+        public InputAction @Interact => m_Wrapper.m_Player_Interact;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -395,6 +421,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @DiagonalMove.started += instance.OnDiagonalMove;
             @DiagonalMove.performed += instance.OnDiagonalMove;
             @DiagonalMove.canceled += instance.OnDiagonalMove;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
         }
 
         /// <summary>
@@ -418,6 +447,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @DiagonalMove.started -= instance.OnDiagonalMove;
             @DiagonalMove.performed -= instance.OnDiagonalMove;
             @DiagonalMove.canceled -= instance.OnDiagonalMove;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
         }
 
         /// <summary>
@@ -499,5 +531,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDiagonalMove(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteract(InputAction.CallbackContext context);
     }
 }

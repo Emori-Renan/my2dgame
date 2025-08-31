@@ -1,16 +1,19 @@
 using UnityEngine;
 using MyGame.Managers;
-using Unity.Mathematics;
-using UnityEngine.U2D;
+using MyGame.Core;
 using UnityEngine.InputSystem;
+using System.Collections;
 using System.Collections.Generic;
+using MyGame.Player;
+using UnityEngine.Rendering.Universal;
 
 namespace MyGame.Managers
 {
     public class GridRenderer : MonoBehaviour
     {
         private GridManager gridManager;
-        
+        private ClosedWorldMovement playerMovement;
+
         private bool isLineVisible = false;
         private Material lineMaterial;
         private readonly List<LineRenderer> aimingLines = new List<LineRenderer>();
@@ -35,9 +38,29 @@ namespace MyGame.Managers
             if (gridManager == null)
             {
                 Debug.LogError("GridRenderer: No GridManager instance found. Aiming line will not function.");
+                this.enabled = false;
                 return;
             }
+            
+            StartCoroutine(InitializeGridRenderer());
+            SetLineVisibility(false);
+        }
 
+        private IEnumerator InitializeGridRenderer()
+        {
+            // Wait until GameManager has spawned the player
+            yield return new WaitUntil(() => GameManager.Instance != null && GameManager.Instance.playerTransform != null);
+
+            // Get the player's movement script from the spawned player object
+            playerMovement = GameManager.Instance.playerTransform.GetComponent<ClosedWorldMovement>();
+            if (playerMovement == null)
+            {
+                Debug.LogError("GridRenderer: Player (ClosedWorldMovement) component not found on the spawned player object.");
+                yield break; // Stop the coroutine if no player movement script is found
+            }
+            Debug.Log("GridRenderer: Player found. Aiming line will now function correctly.");
+
+            // Now that we have the player reference, initialize the line renderers
             for (int i = 0; i < aimingLineLength; i++)
             {
                 GameObject lineGO = new GameObject("AimingLine_" + i);
@@ -47,8 +70,6 @@ namespace MyGame.Managers
                 ConfigureLineRenderer(lr);
                 aimingLines.Add(lr);
             }
-
-            SetLineVisibility(false);
         }
 
         private void ConfigureLineRenderer(LineRenderer lr)
@@ -60,6 +81,8 @@ namespace MyGame.Managers
             lr.loop = true;
             lr.useWorldSpace = true;
             lr.textureMode = LineTextureMode.Stretch;
+            lr.sortingLayerName = "Foreground";
+            lr.sortingOrder = 100;
         }
 
         public void ToggleAimingLine(bool isVisible)
@@ -81,22 +104,35 @@ namespace MyGame.Managers
 
         private void Update()
         {
-            if (isLineVisible)
+            if (isLineVisible && playerMovement != null && gridManager != null && gridManager.IsGridDataInitialized)
             {
                 DrawAimingPath();
+            }
+            else if (!isLineVisible)
+            {
+                SetLineVisibility(false);
             }
         }
 
         private void DrawAimingPath()
         {
-            if (gridManager == null || Camera.main == null)
+            if (gridManager == null || Camera.main == null || playerMovement == null)
             {
-                Debug.LogError("DrawAimingPath: Missing critical references.");
+                Debug.LogError("DrawAimingPath: Missing critical references (GridManager, Main Camera, or PlayerMovement).");
                 return;
             }
-            
+
             Grid mainGrid = gridManager.GetMainGameGrid();
-            Vector3Int playerCell = gridManager.GetPlayerCellPosition();
+            if (mainGrid == null)
+            {
+                Debug.LogError("DrawAimingPath: Main Unity Grid is null from GridManager.");
+                return;
+            }
+
+            Vector2Int playerGridCoords = gridManager.GetGridCoordinates(playerMovement.transform.position);
+            Vector3Int playerCell = new Vector3Int(playerGridCoords.x + gridManager.GetMapGridBounds().xMin,
+                                                    playerGridCoords.y + gridManager.GetMapGridBounds().yMin, 0);
+
             Vector3 mouseScreenPosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector3.zero;
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
             Vector3Int mouseCell = mainGrid.WorldToCell(mouseWorldPos);
@@ -105,8 +141,9 @@ namespace MyGame.Managers
             Vector3Int normalizedDirection = Vector3Int.zero;
             if (rawDirection.magnitude > 0)
             {
-                int signX = (rawDirection.x == 0) ? 0 : (int)math.sign(rawDirection.x);
-                int signY = (rawDirection.y == 0) ? 0 : (int)math.sign(rawDirection.y);
+                int signX = (rawDirection.x == 0) ? 0 : (rawDirection.x > 0 ? 1 : -1);
+                int signY = (rawDirection.y == 0) ? 0 : (rawDirection.y > 0 ? 1 : -1);
+
                 if (Mathf.Abs(rawDirection.x) > Mathf.Abs(rawDirection.y))
                 {
                     normalizedDirection.x = signX;
@@ -123,11 +160,11 @@ namespace MyGame.Managers
                         normalizedDirection.x = signX;
                     }
                 }
-                else if (rawDirection.x != 0 && rawDirection.y == 0)
+                else if (rawDirection.x != 0)
                 {
                     normalizedDirection.x = signX;
                 }
-                else if (rawDirection.y != 0 && rawDirection.x == 0)
+                else if (rawDirection.y != 0)
                 {
                     normalizedDirection.y = signY;
                 }
@@ -146,13 +183,13 @@ namespace MyGame.Managers
             for (int i = 0; i < aimingLineLength; i++)
             {
                 Vector3Int pathCell = playerCell + normalizedDirection * (i + 1);
-                
-                Vector2Int gridCoords = gridManager.GetGridCoordinates(mainGrid.CellToWorld(pathCell));
-                if (gridManager.GetTileData(gridCoords).type == MyGame.Core.TileType.Undefined)
+                Vector2Int currentGridCoords = gridManager.GetGridCoordinates(mainGrid.CellToWorld(pathCell));
+
+                if (!gridManager.IsPositionValid(currentGridCoords) || gridManager.GetTileData(currentGridCoords).type == TileType.Undefined)
                 {
                     break;
                 }
-                
+
                 DrawCellOutline(aimingLines[i], mainGrid, pathCell);
             }
         }
@@ -160,10 +197,10 @@ namespace MyGame.Managers
         private void DrawCellOutline(LineRenderer lr, Grid mainGrid, Vector3Int cellPosition)
         {
             if (lr == null) return;
-            
+
             Vector3 cellWorldCenter = mainGrid.CellToWorld(cellPosition) + mainGrid.cellSize / 2.0f;
             Vector3 halfCellSize = mainGrid.cellSize / 2f;
-            
+
             float finalNudge = 0;
             PixelPerfectCamera ppc = Camera.main.GetComponent<PixelPerfectCamera>();
             if (ppc != null)
@@ -173,17 +210,17 @@ namespace MyGame.Managers
             Vector3 nudge = new Vector3(finalNudge, finalNudge, 0);
 
             Vector3 bl = cellWorldCenter - halfCellSize + nudge;
-            Vector3 br = new Vector3(cellWorldCenter.x + halfCellSize.x, cellWorldCenter.y - halfCellSize.y, 0) + nudge;
+            Vector3 br = new Vector3(cellWorldCenter.x + halfCellSize.x, cellWorldCenter.y - halfCellSize.y, cellWorldCenter.z) + nudge;
             Vector3 tr = cellWorldCenter + halfCellSize + nudge;
-            Vector3 tl = new Vector3(cellWorldCenter.x - halfCellSize.x, cellWorldCenter.y + halfCellSize.y, 0) + nudge;
-            
+            Vector3 tl = new Vector3(cellWorldCenter.x - halfCellSize.x, cellWorldCenter.y + halfCellSize.y, cellWorldCenter.z) + nudge;
+
             Vector3[] points = new Vector3[5];
             points[0] = bl;
             points[1] = br;
             points[2] = tr;
             points[3] = tl;
             points[4] = bl;
-            
+
             lr.positionCount = points.Length;
             lr.SetPositions(points);
         }

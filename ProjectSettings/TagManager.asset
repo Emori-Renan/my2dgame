@@ -17,7 +17,7 @@ TagManager:
   - Obstacle
   - Ground
   - Enemy
-  - Trigger
+  - Interactable
   - 
   - 
   - 
@@ -38,11 +38,17 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 1955971405
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
   - name: Layout
     uniqueID: 1494180945
+    locked: 0
+  - name: Interactable
+    uniqueID: 120452397
     locked: 0
   - name: Objects
     uniqueID: 2327350045

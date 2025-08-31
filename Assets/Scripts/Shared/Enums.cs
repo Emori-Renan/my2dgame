@@ -14,6 +14,8 @@ namespace MyGame.Core
         Road,
         Water,
         Wall,
-        Forest
+        Door,
+        Forest,
+        Floor,
     }
 }

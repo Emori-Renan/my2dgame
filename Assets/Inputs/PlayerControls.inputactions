@@ -12,7 +12,7 @@
                     "id": "ecbc0e95-8d2d-4480-8df0-7d1844eaf5aa",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press",
                     "initialStateCheck": true
                 },
                 {
@@ -30,7 +30,7 @@
                     "id": "b9c12f25-72e8-4ef8-9848-1938f5601a50",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press",
                     "initialStateCheck": false
                 },
                 {
@@ -39,7 +39,16 @@
                     "id": "264051f8-50d0-46a5-9d8c-bcedffc72a8d",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "Hold(duration=0.1,pressPoint=1.401298E-45)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "46e90a23-aa96-414b-9d21-fdb877d2cb40",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press",
                     "initialStateCheck": false
                 }
             ],
@@ -116,7 +125,7 @@
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard and mouse",
                     "action": "ToggleGrid",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -129,6 +138,17 @@
                     "processors": "",
                     "groups": ";Keyboard and mouse",
                     "action": "DiagonalMove",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7ffd6f3b-8c2d-4bba-8eef-8ff55625a310",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard and mouse",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
