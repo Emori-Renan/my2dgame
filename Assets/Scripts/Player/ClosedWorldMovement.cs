@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using MyGame.Managers;
 using MyGame.Core;
 using MyGame.Pathfinding;
-using MyGame.World; // Added reference to Door script
+using MyGame.World;
 using System;
 
 namespace MyGame.Player
@@ -19,10 +19,14 @@ namespace MyGame.Player
         [Header("Interaction Settings")]
         [SerializeField] private LayerMask interactableLayer;
 
+        [Header("Grid Toggle")]
+        [SerializeField] private bool _isGridToggled = false;
+
         private Animator animator;
         private GridManager gridManager;
         private Grid sceneGrid;
         private GameManager gameManager;
+        private Camera mainCamera;
 
         private bool isMoving = false;
         private Vector2 lastDirection = Vector2.down;
@@ -36,6 +40,7 @@ namespace MyGame.Player
             animator = GetComponent<Animator>();
             gameManager = GameManager.Instance;
             gridManager = GridManager.Instance;
+            mainCamera = Camera.main;
 
             if (gameManager == null) Debug.LogError("ClosedWorldMovement: GameManager not found.");
             if (gridManager == null)
@@ -47,9 +52,13 @@ namespace MyGame.Player
                 if (gridManager.IsGridDataInitialized)
                 {
                     OnGridReady();
-                    Debug.Log("ClosedWorldMovement: GridManager already initialized in Awake. Calling OnGridReady proactively.");
                 }
                 GridManager.OnGridReady += OnGridReady;
+            }
+
+            if (mainCamera == null)
+            {
+                Debug.LogError("ClosedWorldMovement: Main camera not found! Please ensure your scene has a camera tagged as 'MainCamera'.");
             }
         }
 
@@ -69,6 +78,7 @@ namespace MyGame.Player
                 InputManager.Instance.onDiagonalMoveCanceled -= HandleDiagonalMoveCanceled;
                 InputManager.Instance.onInteractPerformed -= OnInteractPerformed;
             }
+            StopAllMovement();
         }
 
         private void OnGridReady()
@@ -92,7 +102,6 @@ namespace MyGame.Player
                 InputManager.Instance.onDiagonalMoveCanceled += HandleDiagonalMoveCanceled;
                 InputManager.Instance.onInteractPerformed += OnInteractPerformed;
             }
-            Debug.Log("ClosedWorldMovement: Enabled.");
         }
 
         private void OnDisable()
@@ -108,7 +117,6 @@ namespace MyGame.Player
                 InputManager.Instance.onInteractPerformed -= OnInteractPerformed;
             }
             StopAllMovement();
-            Debug.Log("ClosedWorldMovement: Disabled.");
         }
 
         private void Start()
@@ -118,17 +126,17 @@ namespace MyGame.Player
 
         private void Update()
         {
+            // If the grid is toggled for aiming, movement is disabled.
+            if (_isGridToggled)
+            {
+                return;
+            }
+
+            // If we are not in the playing state or the grid is not ready, do nothing.
             if (gameManager == null || !gameManager.IsGameReadyForInput || gameManager.currentGameState != GameState.Playing ||
                 gridManager == null || !gridManager.IsGridDataInitialized || sceneGrid == null || !_isGridReady)
             {
                 StopAllMovement();
-                if (gridManager == null || !gridManager.IsGridDataInitialized || sceneGrid == null || !_isGridReady)
-                {
-                    Debug.LogWarning($"ClosedWorldMovement: Movement blocked because grid is not yet fully ready. " +
-                                     $"GM Ready: {gameManager?.IsGameReadyForInput}, GM State: {gameManager?.currentGameState}, " +
-                                     $"GridManager Exists: {gridManager != null}, GridDataInitialized: {gridManager?.IsGridDataInitialized}, " +
-                                     $"SceneGrid Exists: {sceneGrid != null}, _isGridReady Flag: {_isGridReady}");
-                }
                 return;
             }
 
@@ -149,22 +157,9 @@ namespace MyGame.Player
                 Vector2Int startGridPos = gridManager.GetGridCoordinates(transform.position);
                 Vector2Int targetGridPos = startGridPos + new Vector2Int(Mathf.RoundToInt(movementInput.x), Mathf.RoundToInt(movementInput.y));
 
-                Debug.Log($"--- Player Movement Debug ---");
-                Debug.Log($"Player World Pos: {transform.position}");
-                Debug.Log($"GridManager Bounds: {gridManager.GetMapGridBounds()} (Size: {gridManager.GetMapGridBounds().size.x}x{gridManager.GetMapGridBounds().size.y})");
-                Debug.Log($"Player Cell Pos (Unity Grid): {sceneGrid.WorldToCell(transform.position)}");
-                Debug.Log($"Calculated Start Grid Pos (0-indexed): {startGridPos}");
-                Debug.Log($"Calculated Target Grid Pos (0-indexed): {targetGridPos}");
-
-                if (!gridManager.IsPositionValid(startGridPos))
+                if (!gridManager.IsPositionValid(startGridPos) || !gridManager.IsPositionValid(targetGridPos))
                 {
-                    Debug.LogWarning($"ClosedWorldMovement: Player's start grid position ({startGridPos}) is OUTSIDE current map bounds. Cannot move. Check player placement or SceneGridInitializer bounds.");
-                    UpdateAnimation(Vector2.zero);
-                    return;
-                }
-                if (!gridManager.IsPositionValid(targetGridPos))
-                {
-                    Debug.LogWarning($"ClosedWorldMovement: Target grid position ({targetGridPos}) is OUTSIDE current map bounds. Cannot move. Check target position calculation or SceneGridInitializer bounds.");
+                    Debug.LogWarning($"ClosedWorldMovement: Invalid start ({startGridPos}) or target ({targetGridPos}) grid position. Cannot move.");
                     UpdateAnimation(Vector2.zero);
                     return;
                 }
@@ -178,10 +173,60 @@ namespace MyGame.Player
         }
 
         // --- Event Handlers from InputManager ---
+        private void OnSelectPerformed()
+        {
+            if (gameManager == null || !gameManager.IsGameReadyForInput || gameManager.currentGameState != GameState.Playing)
+            {
+                return;
+            }
+            if (_isGridToggled)
+            {
+                // If the grid is toggled for aiming, a select input should not cause movement.
+                return;
+            }
+
+            if (!isMoving)
+            {
+                Vector2 mousePosition = Mouse.current.position.ReadValue();
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, Camera.main.nearClipPlane));
+                Vector3Int targetCell = sceneGrid.WorldToCell(worldPosition);
+                Vector2Int startGridPos = gridManager.GetGridCoordinates(transform.position);
+                Vector2Int targetGridPos = gridManager.GetGridCoordinates(sceneGrid.CellToWorld(targetCell));
+
+                if (!gridManager.IsPositionValid(startGridPos) || !gridManager.IsPositionValid(targetGridPos))
+                {
+                    Debug.LogWarning($"ClosedWorldMovement: Invalid start ({startGridPos}) or target ({targetGridPos}) grid position for OnSelect. Cannot move.");
+                    return;
+                }
+
+                StartMoveToPath(startGridPos, targetGridPos);
+            }
+        }
+
         private void OnMoveInputPerformed(Vector2 movement) { }
         private void OnMoveInputCanceled() { }
-        private void OnSelectPerformed() { }
-        private void OnToggleGridPerformed() { }
+
+        private void OnToggleGridPerformed()
+        {
+            // Stop any current movement before changing state
+            StopAllMovement();
+
+            // Toggle the grid state
+            _isGridToggled = !_isGridToggled;
+            Debug.Log($"Grid toggled. Movement is now: {!_isGridToggled}");
+
+            if (_isGridToggled)
+            {
+                // Start the continuous aiming routine
+                StartCoroutine(AimAtMouseRoutine());
+            }
+            else
+            {
+                // When toggled off, stop the aiming routine and reset animation
+                StopAllCoroutines();
+                UpdateAnimation(Vector2.zero);
+            }
+        }
 
         private void HandleDiagonalMovePerformed()
         {
@@ -194,7 +239,7 @@ namespace MyGame.Player
             _isDiagonalOnlyActive = false;
             Debug.Log("Diagonal move inactive");
         }
-        
+
         private void OnInteractPerformed()
         {
             Debug.Log("OnInteractPerformed: Interaction button pressed.");
@@ -253,6 +298,7 @@ namespace MyGame.Player
             if (path != null && path.Count > 0)
             {
                 currentPath = new Queue<Vector2Int>(path);
+                StopAllCoroutines(); // Stop any existing movement routines
                 StartCoroutine(FollowPathRoutine());
             }
             else
@@ -276,7 +322,6 @@ namespace MyGame.Player
                 }
 
                 Vector3 targetWorldPosition = gridManager.GetWorldPosition(nextTilePos);
-
                 Vector3 startPosition = transform.position;
                 float travelProgress = 0f;
                 float finalSpeed = moveSpeed * speedMultiplier;
@@ -294,6 +339,34 @@ namespace MyGame.Player
             }
             isMoving = false;
             UpdateAnimation(Vector2.zero);
+        }
+
+        private IEnumerator AimAtMouseRoutine()
+        {
+            while (_isGridToggled)
+            {
+                // Get the world position of the mouse cursor
+                Vector2 mousePosition = Mouse.current.position.ReadValue();
+                Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, mainCamera.nearClipPlane));
+
+                // Calculate the direction vector from the player to the mouse
+                Vector2 directionToMouse = (worldPosition - transform.position).normalized;
+
+                // Update the player's lastDirection to face the mouse
+                if (Mathf.Abs(directionToMouse.x) > Mathf.Abs(directionToMouse.y))
+                {
+                    lastDirection = new Vector2(Mathf.Sign(directionToMouse.x), 0);
+                }
+                else
+                {
+                    lastDirection = new Vector2(0, Mathf.Sign(directionToMouse.y));
+                }
+
+                // Update the animation to show the aiming direction without moving the character
+                UpdateAnimation(Vector2.zero);
+
+                yield return null; // Wait until the next frame
+            }
         }
 
         public void StopAllMovement()
