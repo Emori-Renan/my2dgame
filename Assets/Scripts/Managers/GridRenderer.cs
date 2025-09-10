@@ -23,6 +23,9 @@ namespace MyGame.Managers
         [Range(-1.0f, 1.0f)]
         public float pixelNudgeOffset = 0.0f;
 
+        // Public property to read the state
+        public bool IsLineVisible => isLineVisible;
+
         private void Awake()
         {
             if (lineMaterial == null)
@@ -41,9 +44,8 @@ namespace MyGame.Managers
                 this.enabled = false;
                 return;
             }
-            
+
             StartCoroutine(InitializeGridRenderer());
-            SetLineVisibility(false);
         }
 
         private IEnumerator InitializeGridRenderer()
@@ -69,7 +71,16 @@ namespace MyGame.Managers
                 LineRenderer lr = lineGO.AddComponent<LineRenderer>();
                 ConfigureLineRenderer(lr);
                 aimingLines.Add(lr);
+                Debug.Log($"GridRenderer: Created LineRenderer for aiming line {i}.");
             }
+
+            // Set the initial visibility based on the current state
+            SetLineVisibility(false);
+        }
+
+        private void OnDestroy()
+        {
+            // No event to unsubscribe from here now!
         }
 
         private void ConfigureLineRenderer(LineRenderer lr)
@@ -85,14 +96,16 @@ namespace MyGame.Managers
             lr.sortingOrder = 100;
         }
 
+        // Public method to be called by the InputManager
         public void ToggleAimingLine(bool isVisible)
         {
+            Debug.Log($"GridRenderer: Toggling aiming line visibility to {isVisible}.");
+            isLineVisible = isVisible;
             SetLineVisibility(isVisible);
         }
 
         private void SetLineVisibility(bool isVisible)
         {
-            isLineVisible = isVisible;
             foreach (var lr in aimingLines)
             {
                 if (lr != null)
@@ -106,123 +119,15 @@ namespace MyGame.Managers
         {
             if (isLineVisible && playerMovement != null && gridManager != null && gridManager.IsGridDataInitialized)
             {
+                // Simple test line to confirm the method is being called
                 DrawAimingPath();
-            }
-            else if (!isLineVisible)
-            {
-                SetLineVisibility(false);
             }
         }
 
         private void DrawAimingPath()
         {
-            if (gridManager == null || Camera.main == null || playerMovement == null)
-            {
-                Debug.LogError("DrawAimingPath: Missing critical references (GridManager, Main Camera, or PlayerMovement).");
-                return;
-            }
-
-            Grid mainGrid = gridManager.GetMainGameGrid();
-            if (mainGrid == null)
-            {
-                Debug.LogError("DrawAimingPath: Main Unity Grid is null from GridManager.");
-                return;
-            }
-
-            Vector2Int playerGridCoords = gridManager.GetGridCoordinates(playerMovement.transform.position);
-            Vector3Int playerCell = new Vector3Int(playerGridCoords.x + gridManager.GetMapGridBounds().xMin,
-                                                    playerGridCoords.y + gridManager.GetMapGridBounds().yMin, 0);
-
-            Vector3 mouseScreenPosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector3.zero;
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
-            Vector3Int mouseCell = mainGrid.WorldToCell(mouseWorldPos);
-
-            Vector3Int rawDirection = mouseCell - playerCell;
-            Vector3Int normalizedDirection = Vector3Int.zero;
-            if (rawDirection.magnitude > 0)
-            {
-                int signX = (rawDirection.x == 0) ? 0 : (rawDirection.x > 0 ? 1 : -1);
-                int signY = (rawDirection.y == 0) ? 0 : (rawDirection.y > 0 ? 1 : -1);
-
-                if (Mathf.Abs(rawDirection.x) > Mathf.Abs(rawDirection.y))
-                {
-                    normalizedDirection.x = signX;
-                    if (Mathf.Abs(rawDirection.y) * 2 > Mathf.Abs(rawDirection.x))
-                    {
-                        normalizedDirection.y = signY;
-                    }
-                }
-                else if (Mathf.Abs(rawDirection.y) > 0)
-                {
-                    normalizedDirection.y = signY;
-                    if (Mathf.Abs(rawDirection.x) * 2 > Mathf.Abs(rawDirection.y))
-                    {
-                        normalizedDirection.x = signX;
-                    }
-                }
-                else if (rawDirection.x != 0)
-                {
-                    normalizedDirection.x = signX;
-                }
-                else if (rawDirection.y != 0)
-                {
-                    normalizedDirection.y = signY;
-                }
-            }
-
-            foreach (var lr in aimingLines)
-            {
-                lr.positionCount = 0;
-            }
-
-            if (normalizedDirection == Vector3Int.zero)
-            {
-                return;
-            }
-
-            for (int i = 0; i < aimingLineLength; i++)
-            {
-                Vector3Int pathCell = playerCell + normalizedDirection * (i + 1);
-                Vector2Int currentGridCoords = gridManager.GetGridCoordinates(mainGrid.CellToWorld(pathCell));
-
-                if (!gridManager.IsPositionValid(currentGridCoords) || gridManager.GetTileData(currentGridCoords).type == TileType.Undefined)
-                {
-                    break;
-                }
-
-                DrawCellOutline(aimingLines[i], mainGrid, pathCell);
-            }
-        }
-
-        private void DrawCellOutline(LineRenderer lr, Grid mainGrid, Vector3Int cellPosition)
-        {
-            if (lr == null) return;
-
-            Vector3 cellWorldCenter = mainGrid.CellToWorld(cellPosition) + mainGrid.cellSize / 2.0f;
-            Vector3 halfCellSize = mainGrid.cellSize / 2f;
-
-            float finalNudge = 0;
-            PixelPerfectCamera ppc = Camera.main.GetComponent<PixelPerfectCamera>();
-            if (ppc != null)
-            {
-                finalNudge = pixelNudgeOffset / ppc.assetsPPU;
-            }
-            Vector3 nudge = new Vector3(finalNudge, finalNudge, 0);
-
-            Vector3 bl = cellWorldCenter - halfCellSize + nudge;
-            Vector3 br = new Vector3(cellWorldCenter.x + halfCellSize.x, cellWorldCenter.y - halfCellSize.y, cellWorldCenter.z) + nudge;
-            Vector3 tr = cellWorldCenter + halfCellSize + nudge;
-            Vector3 tl = new Vector3(cellWorldCenter.x - halfCellSize.x, cellWorldCenter.y + halfCellSize.y, cellWorldCenter.z) + nudge;
-
-            Vector3[] points = new Vector3[5];
-            points[0] = bl;
-            points[1] = br;
-            points[2] = tr;
-            points[3] = tl;
-            points[4] = bl;
-
-            lr.positionCount = points.Length;
-            lr.SetPositions(points);
+            // Let's just confirm this method is being called with a simple log.
+            Debug.Log("GridRenderer: DrawAimingPath() is being called successfully!");
         }
     }
 }

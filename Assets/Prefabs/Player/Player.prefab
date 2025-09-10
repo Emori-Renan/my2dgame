@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 6490518894809558139}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 40.5, y: 12.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -78,7 +78,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1777905999
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 7595986285605212588, guid: 99bd6833ee9cd6d42a1baf8799468589, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -154,7 +154,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   speedMultiplier: 1
-  collectedKeys: []
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  _isGridToggled: 0
 --- !u!61 &5477485551567293378
 BoxCollider2D:
   m_ObjectHideFlags: 0

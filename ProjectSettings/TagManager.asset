@@ -47,6 +47,9 @@ TagManager:
   - name: Layout
     uniqueID: 1494180945
     locked: 0
+  - name: Foreground
+    uniqueID: 169917713
+    locked: 0
   - name: Interactable
     uniqueID: 120452397
     locked: 0

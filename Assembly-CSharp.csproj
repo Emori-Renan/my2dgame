@@ -52,6 +52,7 @@
     <Compile Include="Assets\Inputs\PlayerControls.cs" />
     <Compile Include="Assets\Scripts\Components\DoorColliderManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Components\simplelinedrawer.cs" />
     <Compile Include="Assets\Scripts\Prefab\TilePrefabMapping.cs" />
     <Compile Include="Assets\Scripts\World\SpawnPoint.cs" />
     <Compile Include="Assets\Scripts\Components\DoorTeleporter.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Assets\Scripts\World\Door.cs" />
     <Compile Include="Assets\Scripts\World\SceneGridInitializer.cs" />
     <Compile Include="Assets\Scripts\Shared\TileData.cs" />
+    <Compile Include="Assets\Scripts\Managers\CinemachinePlayerFollow.cs" />
     <Compile Include="Assets\Scripts\World\LayerTransparencyController.cs" />
     <Compile Include="Assets\Scripts\Pathfinding\AStarPathfinding.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
@@ -74,6 +76,7 @@
     <Compile Include="Assets\Scripts\Shared\TileMappingData.cs" />
     <Compile Include="Assets\Scripts\Managers\GridManager.cs" />
     <Compile Include="Assets\Scripts\Core\Enums.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerInputHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

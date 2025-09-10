@@ -209,7 +209,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 6490518894809558139, guid: c09d9425016477c4ca18e898798e1184, type: 3}
-  closedWorldMovementScript: {fileID: 0}
+  closedWorldMovementScript: {fileID: 7452902275065430874, guid: c09d9425016477c4ca18e898798e1184, type: 3}
+  cinemachineCamera: {fileID: 5881057610700234250, guid: cfa255aec15ee6245a57973a43fd6d9c, type: 3}
   currentGameState: 1
 --- !u!1 &689791085
 GameObject:
