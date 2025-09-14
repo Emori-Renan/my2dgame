@@ -8,11 +8,9 @@ namespace MyGame.Managers
     public class GridManager : MonoBehaviour
     {
         public static GridManager Instance { get; private set; }
-
         public static event Action OnGridReady;
 
         [Header("References")]
-        [Tooltip("The main Unity Grid component that contains all your Tilemaps. Assign this in the Inspector.")]
         [SerializeField] private Grid mainUnityGrid;
 
         private BoundsInt _mapGridBounds;
@@ -152,43 +150,6 @@ namespace MyGame.Managers
                 return _sceneMapGridData[gridCoords.x, gridCoords.y];
             }
             return new CustomTileData { type = TileType.Undefined, isWalkable = false };
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (_sceneMapGridData == null)
-            {
-                return;
-            }
-
-            // Add a small offset to the Z-axis to ensure the gizmos are visible
-            // and don't "fight" with the tilemap rendering.
-            Vector3 gizmoOffset = new Vector3(0, 0, -0.5f);
-
-            for (int y = 0; y < _sceneMapGridData.GetLength(1); y++)
-            {
-                for (int x = 0; x < _sceneMapGridData.GetLength(0); x++)
-                {
-                    Vector2Int gridPos = new Vector2Int(x, y);
-
-                    // Use the GridManager's own method to get the world position.
-                    Vector3 worldPos = GetWorldPosition(gridPos);
-
-                    if (_sceneMapGridData[x, y].isWalkable)
-                    {
-                        // Semi-transparent green for walkable tiles.
-                        Gizmos.color = new Color(0, 1, 0, 0.5f);
-                    }
-                    else
-                    {
-                        // Semi-transparent red for unwalkable tiles.
-                        Gizmos.color = new Color(1, 0, 0, 0.5f);
-                    }
-
-                    // Draw a cube at the world position of the grid cell.
-                    Gizmos.DrawCube(worldPos + gizmoOffset, Vector3.one * 0.9f);
-                }
-            }
         }
     }
 }

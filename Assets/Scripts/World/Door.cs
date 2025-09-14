@@ -1,10 +1,11 @@
 using UnityEngine;
+using MyGame.Core; // Import the namespace where IInteractable is defined.
 
 namespace MyGame.World
 {
     // A simple script to represent a door that can be interacted with.
     [RequireComponent(typeof(SpriteRenderer))]
-    public class Door : MonoBehaviour
+    public class Door : MonoBehaviour, IInteractable // Implement the IInteractable interface.
     {
         private SpriteRenderer spriteRenderer;
         private bool isOpen = false;
@@ -15,9 +16,9 @@ namespace MyGame.World
         }
 
         /// <summary>
-        /// Toggles the state of the door between open and closed.
+        /// This method is called by the PlayerInteractor when the door is interacted with.
         /// </summary>
-        public void ToggleDoor()
+        public void Interact() // Rename the method to match the interface's contract.
         {
             isOpen = !isOpen;
             if (isOpen)
