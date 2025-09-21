@@ -19,7 +19,7 @@ namespace MyGame.Player
         private Queue<Vector2Int> currentPath;
 
         private Vector2 heldDirection = Vector2.zero;
-        private bool isMoving = false;
+        public bool isMoving = false;
 
         private void Awake()
         {
@@ -88,8 +88,7 @@ namespace MyGame.Player
                     {
                         isMoving = true;
                         Vector3 targetWorldPosition = gridManager.GetWorldPosition(nextGridPos);
-                        Vector2 direction = (targetWorldPosition - transform.position).normalized;
-                        playerAnimator.UpdateAnimation(direction);
+                        playerAnimator.UpdateAnimation(heldDirection);
 
                         while (Vector3.Distance(transform.position, targetWorldPosition) > 0.01f)
                         {
@@ -125,9 +124,7 @@ namespace MyGame.Player
             {
                 Vector2Int nextTilePos = currentPath.Dequeue();
                 Vector3 targetWorldPosition = gridManager.GetWorldPosition(nextTilePos);
-                Vector3 startPosition = transform.position;
-                Vector2 direction = (targetWorldPosition - startPosition).normalized;
-
+                Vector2 direction = (targetWorldPosition - transform.position).normalized;
                 playerAnimator.UpdateAnimation(direction);
 
                 while (Vector3.Distance(transform.position, targetWorldPosition) > 0.05f)

@@ -62,6 +62,7 @@
     <Compile Include="Assets\Scripts\Shared\SceneLoader.cs" />
     <Compile Include="Assets\Scripts\Managers\GridRenderer.cs" />
     <Compile Include="Assets\Scripts\World\Door.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerTurnTaker.cs" />
     <Compile Include="Assets\Scripts\World\SceneGridInitializer.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerInteractor.cs" />
     <Compile Include="Assets\Scripts\Shared\TileData.cs" />

@@ -15,8 +15,8 @@ namespace MyGame.Player
         private Grid sceneGrid;
 
         private PlayerMovement playerMovement;
+        public Vector2Int LastMoveDirection { get; private set; } = Vector2Int.down;
 
-        public event System.Action<bool> OnGridToggleChanged;
 
         private void Awake()
         {
@@ -39,7 +39,7 @@ namespace MyGame.Player
                 GridManager.OnGridReady += OnGridReady;
             }
         }
-        
+
         public void OnSceneLoaded(Vector3 initialPosition)
         {
             if (gameManager != null)
@@ -51,7 +51,7 @@ namespace MyGame.Player
 
         public void OnMouseClick(Vector3 worldPosition)
         {
-            if (!IsGameReadyForMovement() || IsGridToggled()) return;
+            if (!IsGameReadyForMovement()) return;
 
             Vector2Int startGridPos = gridManager.GetGridCoordinates(transform.position);
             Vector2Int targetGridPos = gridManager.GetGridCoordinates(worldPosition);
@@ -65,21 +65,10 @@ namespace MyGame.Player
             playerMovement.StartMoveToPath(startGridPos, targetGridPos);
         }
 
-        public void ToggleGrid()
-        {
-            // playerMovement.StopAllMovement();
-            OnGridToggleChanged?.Invoke(IsGridToggled());
-        }
-
         private bool IsGameReadyForMovement()
         {
             return gameManager != null && gameManager.IsGameReadyForInput && gameManager.currentGameState == GameState.Playing &&
                    gridManager != null && gridManager.IsGridDataInitialized && sceneGrid != null;
-        }
-
-        public bool IsGridToggled()
-        {
-            return false;
         }
 
         private void OnGridReady()
@@ -92,5 +81,8 @@ namespace MyGame.Player
             }
             Debug.Log("Player is ready for movement.");
         }
+
     }
+
+
 }

@@ -1,25 +1,21 @@
 using UnityEngine;
 using MyGame.Managers;
-using MyGame.Core;
-using UnityEngine.InputSystem;
+using MyGame.Player;
 using System.Collections;
 using System.Collections.Generic;
-using MyGame.Player;
-using UnityEngine.Rendering.Universal;
 
 namespace MyGame.Managers
 {
     public class GridRenderer : MonoBehaviour
     {
         private GridManager gridManager;
-        private ClosedWorldMovement playerMovement;
 
         private bool isLineVisible = false;
-        private Material lineMaterial;
-        private readonly List<LineRenderer> aimingLines = new List<LineRenderer>();
+        private LineRenderer aimingLine;
 
         [Header("Aiming Line Settings")]
         public int aimingLineLength = 3;
+        public float lineGap = 0.5f;
         [Range(-1.0f, 1.0f)]
         public float pixelNudgeOffset = 0.0f;
 
@@ -28,11 +24,7 @@ namespace MyGame.Managers
 
         private void Awake()
         {
-            if (lineMaterial == null)
-            {
-                lineMaterial = new Material(Shader.Find("Unlit/Color"));
-                lineMaterial.color = Color.white;
-            }
+            InitializeLineRenderer();
         }
 
         private void Start()
@@ -45,89 +37,101 @@ namespace MyGame.Managers
                 return;
             }
 
-            StartCoroutine(InitializeGridRenderer());
+            ToggleAimingLine(false);
         }
 
-        private IEnumerator InitializeGridRenderer()
+        private void InitializeLineRenderer()
         {
-            // Wait until GameManager has spawned the player
-            yield return new WaitUntil(() => GameManager.Instance != null && GameManager.Instance.playerTransform != null);
+            GameObject lineGO = new GameObject("AimingLine");
+            lineGO.transform.SetParent(this.transform);
+            lineGO.transform.localPosition = Vector3.zero;
+            aimingLine = lineGO.AddComponent<LineRenderer>();
 
-            // Get the player's movement script from the spawned player object
-            playerMovement = GameManager.Instance.playerTransform.GetComponent<ClosedWorldMovement>();
-            if (playerMovement == null)
-            {
-                Debug.LogError("GridRenderer: Player (ClosedWorldMovement) component not found on the spawned player object.");
-                yield break; // Stop the coroutine if no player movement script is found
-            }
-            Debug.Log("GridRenderer: Player found. Aiming line will now function correctly.");
+            Material lineMaterial = new Material(Shader.Find("Unlit/Color"));
+            lineMaterial.color = Color.white;
 
-            // Now that we have the player reference, initialize the line renderers
-            for (int i = 0; i < aimingLineLength; i++)
-            {
-                GameObject lineGO = new GameObject("AimingLine_" + i);
-                lineGO.transform.SetParent(this.transform);
-                lineGO.transform.localPosition = Vector3.zero;
-                LineRenderer lr = lineGO.AddComponent<LineRenderer>();
-                ConfigureLineRenderer(lr);
-                aimingLines.Add(lr);
-                Debug.Log($"GridRenderer: Created LineRenderer for aiming line {i}.");
-            }
-
-            // Set the initial visibility based on the current state
-            SetLineVisibility(false);
+            aimingLine.material = lineMaterial;
+            aimingLine.startWidth = 0.05f;
+            aimingLine.endWidth = 0.05f;
+            aimingLine.loop = false;
+            aimingLine.useWorldSpace = true;
+            aimingLine.sortingLayerName = "Foreground";
+            aimingLine.sortingOrder = 100;
         }
 
-        private void OnDestroy()
-        {
-            // No event to unsubscribe from here now!
-        }
-
-        private void ConfigureLineRenderer(LineRenderer lr)
-        {
-            lr.material = lineMaterial;
-            lr.startWidth = 0.05f;
-            lr.endWidth = 0.05f;
-            lr.positionCount = 5;
-            lr.loop = true;
-            lr.useWorldSpace = true;
-            lr.textureMode = LineTextureMode.Stretch;
-            lr.sortingLayerName = "Foreground";
-            lr.sortingOrder = 100;
-        }
-
-        // Public method to be called by the InputManager
         public void ToggleAimingLine(bool isVisible)
         {
-            Debug.Log($"GridRenderer: Toggling aiming line visibility to {isVisible}.");
             isLineVisible = isVisible;
-            SetLineVisibility(isVisible);
+            if (aimingLine != null)
+            {
+                aimingLine.enabled = isVisible;
+            }
         }
 
-        private void SetLineVisibility(bool isVisible)
+        public void SetAimingDirection(Vector3 playerPosition, Vector3 direction)
         {
-            foreach (var lr in aimingLines)
+            if (!isLineVisible || aimingLine == null || gridManager == null)
             {
-                if (lr != null)
+                return;
+            }
+
+            // Determine the snapped grid direction based on the fluid direction
+            Vector2Int snappedDirection = Vector2Int.zero;
+            if (direction.magnitude > 0.1f)
+            {
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                // Normalize the angle to be between 0 and 360
+                angle = (angle + 360) % 360;
+
+                // An array of the 8 possible grid directions
+                Vector2Int[] gridDirections = new Vector2Int[]
                 {
-                    lr.enabled = isVisible;
-                }
-            }
-        }
+                    new Vector2Int(1, 0),    // Right
+                    new Vector2Int(1, 1),    // Up-Right
+                    new Vector2Int(0, 1),    // Up
+                    new Vector2Int(-1, 1),   // Up-Left
+                    new Vector2Int(-1, 0),   // Left
+                    new Vector2Int(-1, -1),  // Down-Left
+                    new Vector2Int(0, -1),   // Down
+                    new Vector2Int(1, -1)    // Down-Right
+                };
 
-        private void Update()
-        {
-            if (isLineVisible && playerMovement != null && gridManager != null && gridManager.IsGridDataInitialized)
+                // Determine the index of the direction by dividing the angle by 45 degrees
+                int index = Mathf.RoundToInt(angle / 45.0f);
+                // Ensure the index is within the bounds of the array
+                index = (index + 8) % 8;
+
+                snappedDirection = gridDirections[index];
+            }
+
+            if (snappedDirection == Vector2Int.zero)
             {
-                // Simple test line to confirm the method is being called
-                DrawAimingPath();
+                aimingLine.enabled = false;
+                return;
             }
-        }
 
-        private void DrawAimingPath()
-        {
-            // Let's just confirm this method is being called with a simple log.
-            Debug.Log("GridRenderer: DrawAimingPath() is being called successfully!");
+            // Draw the line based on the snapped, grid-aligned direction
+            Vector3[] linePositions = new Vector3[aimingLineLength + 1];
+            linePositions[0] = playerPosition;
+            Vector2Int currentGridPos = gridManager.GetGridCoordinates(playerPosition);
+
+            for (int i = 1; i <= aimingLineLength; i++)
+            {
+                Vector2Int nextGridPos = currentGridPos + snappedDirection * i;
+
+                if (!gridManager.IsWalkable(nextGridPos))
+                {
+                    aimingLine.positionCount = i;
+                    break;
+                }
+
+                Vector3 targetWorldPos = gridManager.GetWorldPosition(nextGridPos);
+                linePositions[i] = targetWorldPos;
+                aimingLine.positionCount = i + 1;
+            }
+
+            aimingLine.SetPositions(linePositions);
+            aimingLine.enabled = true;
         }
     }
 }

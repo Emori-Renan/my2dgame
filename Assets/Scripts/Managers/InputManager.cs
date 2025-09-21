@@ -49,21 +49,27 @@ namespace MyGame.Managers
 
             // Other actions
             playerControls.Player.Interact.performed += ctx => onInteractPerformed?.Invoke();
-            playerControls.Player.ToggleGrid.performed += ctx => onToggleGridPerformed?.Invoke();
+            playerControls.Player.ToggleGrid.started += ctx => onToggleGridPerformed?.Invoke();
             playerControls.Player.DiagonalMove.performed += ctx => onDiagonalMovePerformed?.Invoke();
             playerControls.Player.DiagonalMove.canceled += ctx => onDiagonalMoveCanceled?.Invoke();
-            
+
             Debug.Log("InputManager: Initialized singleton in Awake.");
         }
 
         private void OnEnable()
         {
-            playerControls.Enable();
+            if (playerControls != null)
+            {
+                playerControls.Enable();
+            }
         }
 
         private void OnDisable()
         {
-            playerControls.Disable();
+            if (playerControls != null)
+            {
+                playerControls.Enable();
+            }
         }
 
         public Vector2 GetMovementDirection()
